@@ -13,17 +13,16 @@ const resolveApiBaseUrl = () => {
 
   let url;
   if (isLocal) {
-    // If local, prefer localhost:5005 unless custom local URL is specified
     url =
-      envUrl && envUrl.includes('localhost')
+      envUrl && envUrl.trim() !== ''
         ? envUrl.trim()
-        : 'http://localhost:5005/api';
+        : 'http://localhost:5000/api';
   } else {
     // In production on Render/Vercel
     url =
       envUrl && envUrl.trim() !== ''
         ? envUrl.trim()
-        : 'https://recipe-4-c8mu.onrender.com/api';
+        : 'https://recipe-sharing-platform-fgwp.onrender.com/api';
   }
 
   // Strip trailing slashes
@@ -44,10 +43,6 @@ export const resolveImageBaseUrl = () => {
     (typeof window !== 'undefined' &&
       (window.location.hostname === 'localhost' ||
         window.location.hostname === '127.0.0.1'));
-
-  if (isLocal) {
-    return 'http://localhost:5005';
-  }
 
   const envImageUrl = import.meta.env.VITE_IMAGE_BASE_URL;
   if (envImageUrl && envImageUrl.trim() !== '') {

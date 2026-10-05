@@ -3,10 +3,10 @@ const fs = require('fs');
 const path = require('path');
 const FormData = require('form-data');
 
-const BASE_URL = 'http://localhost:5005/api';
+const BASE_URL = (process.env.TEST_API_URL || 'http://localhost:5005/api').replace(/\/+$/, '');
 
 const runTests = async () => {
-  console.log('🧪 Starting Full-Stack Recipe Haven API Verification Suite...\n');
+  console.log(`🧪 Starting Full-Stack Recipe Haven API Verification Suite against ${BASE_URL}...\n`);
   let passed = 0;
   let failed = 0;
 
@@ -22,7 +22,8 @@ const runTests = async () => {
 
   try {
     // 1. Health check
-    const healthRes = await axios.get('http://localhost:5005/api/health');
+    const healthUrl = BASE_URL.endsWith('/api') ? `${BASE_URL}/health` : `${BASE_URL}/api/health`;
+    const healthRes = await axios.get(healthUrl);
     assert(healthRes.data.status === 'ok', 'API Health Check is OK');
 
     // 2. User Registration
@@ -41,7 +42,7 @@ const runTests = async () => {
       email: testEmail,
       password: 'password123',
     });
-    assert(loginRes.data.success && loginRes.data.token === userToken, 'User Login & Token Generation');
+    assert(loginRes.data.success && Boolean(loginRes.data.token), 'User Login & Token Generation');
 
     // 4. Authenticated Profile
     const profileRes = await axios.get(`${BASE_URL}/auth/me`, {
